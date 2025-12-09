@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fin de Año 2025 | The Event</title>
+    <title>Fin de Año 2025 | Presupuestos</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -17,21 +17,14 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
                     colors: {
                         gold: '#D4AF37',
                         goldlight: '#F3E5AB',
                         dark: '#0a0a0a',
                         glass: 'rgba(255, 255, 255, 0.05)',
-                        glassborder: 'rgba(255, 255, 255, 0.1)',
                     },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-out',
-                        'slide-up': 'slideUp 0.3s ease-out',
-                    },
+                    animation: { 'fade-in': 'fadeIn 0.5s ease-out', 'slide-up': 'slideUp 0.3s ease-out' },
                     keyframes: {
                         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
                         slideUp: { '0%': { transform: 'translateY(10px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
@@ -43,73 +36,98 @@
 
     <style>
         body { background-color: #050505; color: #E0E0E0; background-image: radial-gradient(circle at 50% 0%, #1a1a1a 0%, #050505 70%); }
-        
-        /* Glassmorphism Classes */
         .glass-panel {
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(212, 175, 55, 0.15);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            background: rgba(20, 20, 20, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
-
         .gold-gradient-text {
-            background: linear-gradient(to right, #D4AF37, #F3E5AB, #D4AF37);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-size: 200% auto;
-            animation: shine 4s linear infinite;
+            background: linear-gradient(to right, #D4AF37, #F3E5AB, #D4AF37); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; background-size: 200% auto; animation: shine 4s linear infinite;
         }
-
-        .gold-btn {
-            background: linear-gradient(135deg, #D4AF37 0%, #B49020 100%);
-            color: #000;
-        }
-
+        .gold-btn { background: linear-gradient(135deg, #D4AF37 0%, #B49020 100%); color: #000; }
         @keyframes shine { to { background-position: 200% center; } }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // ✅ TU URL DE GOOGLE APPS SCRIPT
+        // ✅ URL ACTUALIZADA
         const API_URL = 'https://script.google.com/macros/s/AKfycbynd1X7GcM7qUTCZRx9aVUMC6YpfBQJTJCkydse4ILCK6SppVXFn70EmpvPveH9UXia5Q/exec';
 
         const USERS = ['Juan', 'Quintana', 'Germán', 'Jose', 'Cantero', 'Alejandro', 'David', 'Jorge', 'Arbelo'];
         
+        // 💰 CONFIGURACIÓN CON PRESUPUESTOS (BUDGET)
         const TASK_CONFIG = {
-            alcohol: { icon: '🍷', label: 'Alcohol', desc: 'Barra libre y cócteles', options: ['Vodka', 'Ron', 'Ginebra', 'Whisky', 'Tequila', 'Champagne', 'Refrescos', 'Hielo', 'OTRO'], unit: 'ml/L', placeholder: 'Ej: 2 Botellas Grey Goose...' },
-            musica: { icon: '🎵', label: 'Música', desc: 'Ambiente y sonido', options: ['Altavoz', 'Mesa Mezclas', 'Micrófono', 'Luces', 'Playlist', 'OTRO'], unit: 'W/Info', placeholder: 'Ej: Altavoz JBL 1000W...' },
-            logistica: { icon: '🚘', label: 'Logística', desc: 'Transporte y uber', options: [], unit: '', placeholder: 'Ej: Llevo a 3 personas...' },
-            snacks: { icon: '🥂', label: 'Gourmet', desc: 'Aperitivos y cena', options: ['Canapés', 'Ibéricos', 'Quesos', 'Snacks', 'Uvas', 'OTRO'], unit: 'uds', placeholder: 'Ej: 2 bandejas de jamón...' },
-            menaje: { icon: '🍽️', label: 'Menaje', desc: 'Cristalería y servicio', options: ['Copas', 'Vasos', 'Platos', 'Servilletas', 'Bengalas', 'OTRO'], unit: 'uds', placeholder: 'Ej: 20 Copas de balón...' }
+            alcohol: { 
+                icon: '🍷', label: 'Alcohol', desc: 'Barra libre', 
+                options: ['Vodka', 'Ron', 'Ginebra', 'Whisky', 'Jaggermeister', 'Refrescos', 'Hielo', 'OTRO'], 
+                unit: 'ml/L', budget: 112.5 
+            },
+            musica: { 
+                icon: '🎵', label: 'Música', desc: 'Sonido y ambiente', 
+                options: ['Altavoz', 'Cableado', 'Luces', 'Playlist', 'OTRO'], 
+                unit: 'Info', budget: 20 // Incluye logística según indicación
+            },
+            logistica: { 
+                icon: '🚘', label: 'Logística', desc: 'Transporte', 
+                options: [], 
+                unit: '', budget: 0 // Presupuesto compartido con música
+            },
+            snacks: { 
+                icon: '🍪', label: 'Snacks', desc: 'Picoteo', 
+                options: ['Munchitos', 'Gusanitos', 'Papas Lays', 'Doritos', 'Aceitunas', 'Frutos Secos', 'OTRO'], 
+                unit: 'bolsas', budget: 67.5 
+            },
+            menaje: { 
+                icon: '🍽️', label: 'Menaje', desc: 'Cristalería', 
+                options: ['Vasos tubo', 'Vasos chupito', 'Platos', 'Servilletas', 'OTRO'], 
+                unit: 'uds', budget: 22.5 
+            }
         };
 
-        // --- COMPONENTE: TOAST (Notificación) ---
         const Toast = ({ message, type, onClose }) => {
-            React.useEffect(() => {
-                const timer = setTimeout(onClose, 3000);
-                return () => clearTimeout(timer);
-            }, []);
-
+            React.useEffect(() => { const timer = setTimeout(onClose, 3000); return () => clearTimeout(timer); }, []);
             return (
-                <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-3 rounded-full shadow-2xl animate-fade-in border ${
-                    type === 'error' ? 'bg-red-900/90 border-red-500 text-white' : 'bg-dark/90 border-gold text-gold'
-                }`}>
-                    <span>{type === 'error' ? '⚠️' : '✨'}</span>
-                    <span className="text-sm font-medium">{message}</span>
+                <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] flex items-center gap-3 px-6 py-3 rounded-full shadow-2xl animate-fade-in border ${type === 'error' ? 'bg-red-900/90 border-red-500 text-white' : 'bg-dark/90 border-gold text-gold'}`}>
+                    <span>{type === 'error' ? '⚠️' : '✨'}</span><span className="text-sm font-medium">{message}</span>
                 </div>
             );
         };
 
-        // --- COMPONENTE: PESTAÑA PLANNING (La App Principal) ---
-        const PlanningTab = ({ tasks, user, hasChanges, saving, toggleAssignment, handleDetailChange, addItem, tempInputs, updateTempInput, saveData }) => {
+        // --- BARRA DE PRESUPUESTO ---
+        const BudgetBar = ({ current, max }) => {
+            if (max === 0) return null; // Si no hay presupuesto asignado
+            const percentage = Math.min((current / max) * 100, 100);
+            const isOver = current > max;
+            const remaining = max - current;
+            
+            return (
+                <div className="mt-2 mb-4">
+                    <div className="flex justify-between text-[10px] uppercase tracking-wider mb-1">
+                        <span className={isOver ? 'text-red-400 font-bold' : 'text-gold'}>
+                            Gastado: {current.toFixed(2)}€
+                        </span>
+                        <span className="text-gray-500">
+                            Presupuesto: {max.toFixed(2)}€
+                        </span>
+                    </div>
+                    <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden border border-white/5">
+                        <div 
+                            className={`h-full transition-all duration-500 ${isOver ? 'bg-red-600' : 'bg-gradient-to-r from-gold to-yellow-600'}`}
+                            style={{ width: `${percentage}%` }}
+                        />
+                    </div>
+                    <div className="text-right mt-1">
+                        <span className={`text-[10px] ${remaining < 0 ? 'text-red-500 font-bold' : 'text-green-500'}`}>
+                            {remaining < 0 ? `⚠️ Exceso: ${Math.abs(remaining).toFixed(2)}€` : `Disponible: ${remaining.toFixed(2)}€`}
+                        </span>
+                    </div>
+                </div>
+            );
+        };
+
+        const PlanningTab = ({ tasks, user, hasChanges, saving, toggleAssignment, handleDetailChange, handleCostChange, addItem, tempInputs, updateTempInput, saveData }) => {
             return (
                 <div className="space-y-6 pb-24 animate-slide-up">
                     {Object.entries(tasks).map(([key, task]) => {
@@ -119,70 +137,63 @@
                         const defaultOption = config.options.length > 0 ? config.options[0] : '';
                         const currentSelection = inputs.selectedOption || defaultOption;
 
+                        // Cálculo especial para logística/música que comparten presupuesto
+                        let displayBudget = config.budget;
+                        if (key === 'logistica') displayBudget = 0; // Mostrar solo en música o manejar visualmente
+
                         return (
                             <div key={key} className={`glass-panel rounded-xl overflow-hidden transition-all duration-300 ${isAssigned ? 'border-gold/40 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'opacity-85'}`}>
                                 <div className="p-5">
-                                    <div className="flex items-start justify-between mb-4">
+                                    <div className="flex items-start justify-between mb-2">
                                         <div className="flex items-center gap-4">
                                             <span className="text-3xl filter drop-shadow-lg">{config.icon}</span>
                                             <div>
                                                 <h3 className="font-serif font-bold text-xl tracking-wide text-gray-100">{config.label}</h3>
                                                 <div className="flex flex-wrap gap-1 mt-1">
                                                     {task.assignedTo.length > 0 ? task.assignedTo.map(p => (
-                                                        <span key={p} className="text-[10px] uppercase tracking-wider bg-gold/10 text-goldlight px-2 py-0.5 rounded border border-gold/20">
-                                                            {p}
-                                                        </span>
+                                                        <span key={p} className="text-[10px] uppercase tracking-wider bg-gold/10 text-goldlight px-2 py-0.5 rounded border border-gold/20">{p}</span>
                                                     )) : <span className="text-[10px] text-gray-600 italic">Sin asignar</span>}
                                                 </div>
                                             </div>
                                         </div>
-                                        <button 
-                                            onClick={() => toggleAssignment(key)}
-                                            className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${
-                                                isAssigned 
-                                                ? 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20' 
-                                                : 'bg-gold/10 text-gold border border-gold/30 hover:bg-gold hover:text-dark'
-                                            }`}
-                                        >
+                                        <button onClick={() => toggleAssignment(key)} className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${isAssigned ? 'bg-red-500/10 text-red-400 border border-red-500/30' : 'bg-gold/10 text-gold border border-gold/30'}`}>
                                             {isAssigned ? 'Salir' : 'Entrar'}
                                         </button>
                                     </div>
 
+                                    {/* BARRA DE PRESUPUESTO SIEMPRE VISIBLE */}
+                                    {config.budget > 0 && (
+                                        <BudgetBar current={task.cost || 0} max={config.budget} />
+                                    )}
+
                                     {isAssigned ? (
                                         <div className="space-y-4 animate-fade-in bg-black/20 p-3 rounded-lg border border-white/5">
-                                            {/* BARRA DE HERRAMIENTAS */}
+                                            {/* HERRAMIENTAS */}
                                             <div className="flex flex-col gap-2">
                                                 <div className="flex gap-2 items-end">
                                                     <div className="flex-1">
                                                         <label className="text-[9px] text-gray-500 uppercase tracking-widest mb-1 block">Item</label>
                                                         {config.options.length > 0 ? (
-                                                            <select 
-                                                                className="w-full bg-dark text-sm text-gray-200 p-2 rounded border border-gray-700 focus:border-gold outline-none"
-                                                                onChange={(e) => updateTempInput(key, 'selectedOption', e.target.value)}
-                                                                value={currentSelection}
-                                                            >
-                                                                {config.options.map(opt => (
-                                                                    <option key={opt} value={opt}>{opt === 'OTRO' ? '✏️ Otro...' : opt}</option>
-                                                                ))}
+                                                            <select className="w-full bg-dark text-sm text-gray-200 p-2 rounded border border-gray-700 focus:border-gold outline-none"
+                                                                onChange={(e) => updateTempInput(key, 'selectedOption', e.target.value)} value={currentSelection}>
+                                                                {config.options.map(opt => <option key={opt} value={opt}>{opt === 'OTRO' ? '✏️ Otro...' : opt}</option>)}
                                                             </select>
                                                         ) : (
                                                             <input type="text" placeholder="Item..." className="w-full bg-dark text-sm text-gray-200 p-2 rounded border border-gray-700 focus:border-gold outline-none"
                                                                 onChange={(e) => updateTempInput(key, 'item', e.target.value)} value={inputs.item || ''} />
                                                         )}
                                                     </div>
-                                                    <div className="w-20">
+                                                    <div className="w-16">
                                                         <label className="text-[9px] text-gray-500 uppercase tracking-widest mb-1 block">Cant.</label>
                                                         <input type="text" placeholder="0" className="w-full bg-dark text-sm text-gray-200 p-2 rounded border border-gray-700 focus:border-gold outline-none"
                                                             onChange={(e) => updateTempInput(key, 'qty', e.target.value)} value={inputs.qty || ''} />
                                                     </div>
-                                                    <div className="w-20">
-                                                        <label className="text-[9px] text-gray-500 uppercase tracking-widest mb-1 block">Est. €</label>
+                                                    <div className="w-16">
+                                                        <label className="text-[9px] text-gray-500 uppercase tracking-widest mb-1 block">€ Est.</label>
                                                         <input type="number" placeholder="€" className="w-full bg-dark text-sm text-gray-200 p-2 rounded border border-gray-700 focus:border-gold outline-none"
                                                             onChange={(e) => updateTempInput(key, 'price', e.target.value)} value={inputs.price || ''} />
                                                     </div>
-                                                    <button onClick={() => addItem(key, config)} className="gold-btn h-[38px] w-[38px] rounded flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
-                                                        ➕
-                                                    </button>
+                                                    <button onClick={() => addItem(key, config)} className="gold-btn h-[38px] w-[38px] rounded flex items-center justify-center shadow-lg hover:scale-105 transition-transform">➕</button>
                                                 </div>
                                                 {currentSelection === 'OTRO' && (
                                                     <input type="text" placeholder="Nombre específico..." className="w-full bg-dark text-sm text-gold p-2 rounded border border-gold/40 outline-none"
@@ -190,18 +201,23 @@
                                                 )}
                                             </div>
 
-                                            <textarea
-                                                value={task.details}
-                                                onChange={(e) => handleDetailChange(key, e.target.value)}
-                                                className="w-full bg-transparent text-sm text-gray-300 p-2 rounded border border-gray-700/50 focus:border-gold outline-none h-24 font-mono leading-relaxed placeholder-gray-700"
-                                                placeholder={config.placeholder}
-                                            />
+                                            <textarea value={task.details} onChange={(e) => handleDetailChange(key, e.target.value)}
+                                                className="w-full bg-transparent text-sm text-gray-300 p-2 rounded border border-gray-700/50 focus:border-gold outline-none h-20 font-mono leading-relaxed placeholder-gray-700"
+                                                placeholder="Lista de items..." />
+                                            
+                                            {/* EDITOR MANUAL DE COSTE TOTAL */}
+                                            <div className="flex items-center gap-2 border-t border-white/5 pt-2">
+                                                <label className="text-[10px] text-gray-500 uppercase">Corrección manual Total (€):</label>
+                                                <input type="number" 
+                                                    value={task.cost || 0} 
+                                                    onChange={(e) => handleCostChange(key, e.target.value)}
+                                                    className="bg-transparent text-gold font-bold w-20 text-right focus:outline-none border-b border-white/10 focus:border-gold"
+                                                />
+                                            </div>
                                         </div>
                                     ) : (
                                         <div className="py-2 text-center border-t border-white/5 mt-2">
-                                            <p className="text-gray-600 text-xs flex items-center justify-center gap-2">
-                                                🔒 {config.desc}
-                                            </p>
+                                            <p className="text-gray-600 text-xs flex items-center justify-center gap-2">🔒 Apúntate para gestionar</p>
                                         </div>
                                     )}
                                 </div>
@@ -209,15 +225,10 @@
                         );
                     })}
                     
-                    {/* BOTÓN FLOTANTE GUARDAR */}
                     {hasChanges && (
                         <div className="fixed bottom-24 left-0 right-0 px-6 flex justify-center z-40 animate-slide-up">
-                            <button onClick={saveData} disabled={saving} className={`
-                                flex items-center gap-3 px-8 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(212,175,55,0.4)] text-dark text-sm tracking-widest uppercase
-                                transform transition-all duration-300 hover:scale-105
-                                ${saving ? 'bg-gray-400' : 'gold-btn animate-pulse'}
-                            `}>
-                                {saving ? 'Sincronizando...' : '💾 Confirmar Cambios'}
+                            <button onClick={saveData} disabled={saving} className={`flex items-center gap-3 px-8 py-3 rounded-full font-bold shadow-[0_0_20px_rgba(212,175,55,0.4)] text-dark text-sm tracking-widest uppercase transform transition-all duration-300 hover:scale-105 ${saving ? 'bg-gray-400' : 'gold-btn animate-pulse'}`}>
+                                {saving ? 'Calculando...' : '💾 Actualizar Presupuestos'}
                             </button>
                         </div>
                     )}
@@ -225,42 +236,26 @@
             );
         };
 
-        // --- COMPONENTE: PESTAÑA EVENTO (Info estática) ---
         const EventTab = () => (
             <div className="space-y-6 animate-slide-up">
                 <div className="glass-panel p-6 rounded-xl text-center">
-                    <h2 className="font-serif text-2xl text-gold mb-2">The New Year's Eve</h2>
-                    <p className="text-gray-400 text-sm font-light italic">"A night to remember"</p>
+                    <h2 className="font-serif text-2xl text-gold mb-2">Presupuesto Total</h2>
+                    <p className="text-gray-400 text-sm">Control Financiero</p>
                     <div className="my-6 border-t border-white/10 w-1/2 mx-auto"></div>
-                    <div className="space-y-4 text-sm text-gray-300">
-                        <div className="flex flex-col">
-                            <span className="text-gold text-xs uppercase tracking-widest">Dress Code</span>
-                            <span className="font-medium">Etiqueta / Black Tie</span>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="bg-white/5 p-4 rounded-lg">
+                            <span className="block text-gold text-xs uppercase tracking-widest mb-1">Total Presupuesto</span>
+                            <span className="text-xl font-bold">222.50€</span>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-gold text-xs uppercase tracking-widest">Ubicación</span>
-                            <span className="font-medium">Secret Location 📍</span>
+                        <div className="bg-white/5 p-4 rounded-lg">
+                            <span className="block text-gray-400 text-xs uppercase tracking-widest mb-1">Estado</span>
+                            <span className="text-xl font-bold text-green-500">Activo</span>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-gold text-xs uppercase tracking-widest">Hora</span>
-                            <span className="font-medium">21:00h - Amanecer</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div className="glass-panel p-6 rounded-xl">
-                    <h3 className="font-serif text-gold mb-4 text-center">Inspiración</h3>
-                    <div className="grid grid-cols-2 gap-4 text-center text-xs text-gray-400">
-                        <div className="bg-white/5 p-3 rounded">🤵 Smoking</div>
-                        <div className="bg-white/5 p-3 rounded">👗 Vestido Largo</div>
-                        <div className="bg-white/5 p-3 rounded">🍸 Cocktails</div>
-                        <div className="bg-white/5 p-3 rounded">🎆 Fuegos</div>
                     </div>
                 </div>
             </div>
         );
 
-        // --- COMPONENTE: PESTAÑA EQUIPO (Resumen) ---
         const TeamTab = ({ tasks }) => (
             <div className="space-y-4 animate-slide-up pb-20">
                  <h2 className="font-serif text-xl text-gold mb-4 px-2">Estado del Equipo</h2>
@@ -268,28 +263,21 @@
                      <div key={key} className="glass-panel p-4 rounded-xl flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <span className="text-2xl">{TASK_CONFIG[key].icon}</span>
-                            <span className="text-sm font-medium text-gray-200">{TASK_CONFIG[key].label}</span>
+                            <div className="flex flex-col">
+                                <span className="text-sm font-medium text-gray-200">{TASK_CONFIG[key].label}</span>
+                                <span className="text-[10px] text-gold">Gastado: {(task.cost || 0).toFixed(2)}€</span>
+                            </div>
                         </div>
                         <div className="flex -space-x-2">
                             {task.assignedTo.length > 0 ? task.assignedTo.map((p, i) => (
-                                <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-yellow-700 flex items-center justify-center text-[10px] text-black font-bold border-2 border-dark" title={p}>
-                                    {p.charAt(0)}
-                                </div>
-                            )) : <span className="text-xs text-gray-600">Nadie</span>}
+                                <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-gold to-yellow-700 flex items-center justify-center text-[10px] text-black font-bold border-2 border-dark" title={p}>{p.charAt(0)}</div>
+                            )) : <span className="text-xs text-gray-600">--</span>}
                         </div>
                      </div>
                  ))}
-                 
-                 <div className="mt-8 text-center">
-                    <p className="text-xs text-gray-500 uppercase tracking-widest">Total Confirmados</p>
-                    <p className="text-3xl font-serif text-gold mt-2">
-                        {new Set(Object.values(tasks).flatMap(t => t.assignedTo)).size} / {USERS.length}
-                    </p>
-                 </div>
             </div>
         );
 
-        // --- APP PRINCIPAL ---
         function App() {
             const [activeTab, setActiveTab] = React.useState('planning');
             const [user, setUser] = React.useState('');
@@ -301,7 +289,6 @@
             const [tempInputs, setTempInputs] = React.useState({});
 
             React.useEffect(() => { fetchData(); }, []);
-
             const showToast = (msg, type = 'success') => setToast({ message: msg, type });
 
             const fetchData = async () => {
@@ -310,8 +297,7 @@
                     const data = await response.json();
                     setTasks(data);
                     setHasChanges(false);
-                } catch (err) { showToast('Error cargando datos', 'error'); } 
-                finally { setLoading(false); }
+                } catch (err) { showToast('Error cargando datos', 'error'); } finally { setLoading(false); }
             };
 
             const saveData = async () => {
@@ -320,12 +306,8 @@
                     const params = new URLSearchParams({ action: 'save', data: JSON.stringify(tasks) });
                     const response = await fetch(`${API_URL}?${params.toString()}`);
                     const result = await response.json();
-                    if (result.success) {
-                        setHasChanges(false);
-                        showToast('Cambios guardados correctamente');
-                    } else throw new Error();
-                } catch (err) { showToast('Error al guardar', 'error'); } 
-                finally { setSaving(false); }
+                    if (result.success) { setHasChanges(false); showToast('Datos y costes actualizados'); } else throw new Error();
+                } catch (err) { showToast('Error al guardar', 'error'); } finally { setSaving(false); }
             };
 
             const toggleAssignment = (taskId) => {
@@ -343,6 +325,12 @@
                 setHasChanges(true);
             };
 
+            const handleCostChange = (taskId, value) => {
+                const numValue = parseFloat(value) || 0;
+                setTasks(prev => ({ ...prev, [taskId]: { ...prev[taskId], cost: numValue } }));
+                setHasChanges(true);
+            };
+
             const addItem = (taskId, config) => {
                 const inputs = tempInputs[taskId] || {};
                 let itemName = inputs.selectedOption || (config.options.length > 0 ? config.options[0] : '');
@@ -350,15 +338,32 @@
                 else if (config.options.length === 0) itemName = inputs.item;
 
                 const qty = inputs.qty || '';
-                const price = inputs.price ? `(Est. ${inputs.price}€)` : '';
+                const priceEst = parseFloat(inputs.price) || 0; // Capturamos el precio
+                const priceText = priceEst > 0 ? `(${priceEst}€)` : '';
 
                 if (!itemName) return;
 
-                const textToAdd = `• ${itemName}: ${qty} ${config.unit.replace('/Info','')} ${price}`;
+                const textToAdd = `• ${itemName}: ${qty} ${config.unit.replace('/Info','')} ${priceText}`;
+                
+                // Actualizar texto
                 const currentDetails = tasks[taskId].details || '';
                 const newDetails = currentDetails ? `${currentDetails}\n${textToAdd}` : textToAdd;
+                
+                // Actualizar Coste Total (Suma automática)
+                const currentCost = tasks[taskId].cost || 0;
+                const newCost = currentCost + priceEst;
 
-                handleDetailChange(taskId, newDetails);
+                setTasks(prev => ({
+                    ...prev,
+                    [taskId]: { 
+                        ...prev[taskId], 
+                        details: newDetails,
+                        cost: newCost 
+                    }
+                }));
+                setHasChanges(true);
+                
+                // Reset inputs
                 setTempInputs(prev => ({ ...prev, [taskId]: { ...prev[taskId], qty: '', customName: '', item: '', price: '' } }));
             };
 
@@ -366,60 +371,36 @@
                 setTempInputs(prev => ({ ...prev, [taskId]: { ...prev[taskId] || {}, [field]: value } }));
             };
 
-            if (loading) return (
-                <div className="min-h-screen flex flex-col items-center justify-center bg-dark text-gold">
-                    <div className="animate-spin text-4xl mb-4">✨</div>
-                    <div className="font-serif tracking-widest animate-pulse">CARGANDO FIESTA...</div>
-                </div>
-            );
+            if (loading) return <div className="min-h-screen flex flex-col items-center justify-center bg-dark text-gold"><div className="animate-spin text-4xl mb-4">✨</div></div>;
 
             return (
                 <div className="min-h-screen font-sans selection:bg-gold selection:text-black">
                     {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-
                     <div className="max-w-md mx-auto min-h-screen flex flex-col">
-                        {/* Header */}
                         <div className="pt-8 pb-6 text-center px-4">
                             <h1 className="font-serif text-4xl gold-gradient-text font-bold mb-2">FIN DE AÑO 2025</h1>
-                            <p className="text-gray-500 text-[10px] tracking-[0.3em] uppercase">Private Event Organization</p>
+                            <p className="text-gray-500 text-[10px] tracking-[0.3em] uppercase">Control Presupuestario</p>
                         </div>
-
-                        {/* User Selector (Solo visible en Planning) */}
                         {activeTab === 'planning' && (
                             <div className="px-4 mb-6">
                                 <div className="glass-panel p-3 rounded-lg flex items-center gap-3">
                                     <span className="text-xl">👤</span>
-                                    <select value={user} onChange={(e) => setUser(e.target.value)}
-                                        className="w-full bg-transparent text-gray-200 text-sm focus:outline-none cursor-pointer">
+                                    <select value={user} onChange={(e) => setUser(e.target.value)} className="w-full bg-transparent text-gray-200 text-sm focus:outline-none cursor-pointer">
                                         <option value="" className="bg-dark text-gray-500">¿Quién eres?</option>
                                         {USERS.map(u => <option key={u} value={u} className="bg-dark">{u}</option>)}
                                     </select>
                                 </div>
                             </div>
                         )}
-
-                        {/* Content Area */}
                         <div className="flex-1 px-4">
-                            {activeTab === 'planning' && <PlanningTab {...{ tasks, user, hasChanges, saving, toggleAssignment, handleDetailChange, addItem, tempInputs, updateTempInput, saveData }} />}
+                            {activeTab === 'planning' && <PlanningTab {...{ tasks, user, hasChanges, saving, toggleAssignment, handleDetailChange, handleCostChange, addItem, tempInputs, updateTempInput, saveData }} />}
                             {activeTab === 'event' && <EventTab />}
                             {activeTab === 'team' && <TeamTab tasks={tasks} />}
                         </div>
-
-                        {/* Bottom Navigation Tabs */}
                         <div className="fixed bottom-0 left-0 right-0 bg-dark/90 backdrop-blur-xl border-t border-white/10 z-50">
                             <div className="max-w-md mx-auto flex justify-around p-2">
-                                {[
-                                    { id: 'planning', icon: '📝', label: 'Planning' },
-                                    { id: 'event', icon: '🎩', label: 'Evento' },
-                                    { id: 'team', icon: '👥', label: 'Equipo' }
-                                ].map(tab => (
-                                    <button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        className={`flex flex-col items-center gap-1 p-2 w-20 rounded-lg transition-all duration-300 ${
-                                            activeTab === tab.id ? 'text-gold' : 'text-gray-600 hover:text-gray-400'
-                                        }`}
-                                    >
+                                {[{ id: 'planning', icon: '📝', label: 'Planning' }, { id: 'event', icon: '🎩', label: 'Evento' }, { id: 'team', icon: '👥', label: 'Equipo' }].map(tab => (
+                                    <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex flex-col items-center gap-1 p-2 w-20 rounded-lg transition-all duration-300 ${activeTab === tab.id ? 'text-gold' : 'text-gray-600 hover:text-gray-400'}`}>
                                         <span className={`text-xl transform transition-transform ${activeTab === tab.id ? '-translate-y-1' : ''}`}>{tab.icon}</span>
                                         <span className="text-[9px] uppercase tracking-widest font-medium">{tab.label}</span>
                                     </button>
