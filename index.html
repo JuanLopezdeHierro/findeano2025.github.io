@@ -25,10 +25,8 @@
     <style>
         body { background-color: #121212; color: #E0E0E0; }
         .gold-gradient { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); }
-        /* Animación suave para el candado */
         .fade-enter { opacity: 0; }
         .fade-enter-active { opacity: 1; transition: opacity 300ms; }
-        /* Scrollbar personalizada */
         textarea::-webkit-scrollbar { width: 8px; }
         textarea::-webkit-scrollbar-track { background: #121212; }
         textarea::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
@@ -39,51 +37,46 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // ⚠️ ASEGÚRATE DE QUE ESTA URL ES LA CORRECTA DE TU PROYECTO
+        // ✅ URL ACTUALIZADA
         const API_URL = 'https://script.google.com/macros/s/AKfycbynd1X7GcM7qUTCZRx9aVUMC6YpfBQJTJCkydse4ILCK6SppVXFn70EmpvPveH9UXia5Q/exec';
 
         const USERS = ['Juan', 'Quintana', 'Germán', 'Jose', 'Cantero', 'Alejandro', 'David', 'Jorge', 'Arbelo'];
         
-        // Configuración específica por tarea
+        // Configuración con opción "OTRO" añadida
         const TASK_CONFIG = {
             alcohol: { 
                 icon: '🍷', 
                 label: 'Alcohol', 
                 desc: 'Bebidas y mezclas',
-                type: 'alcohol', // Para lógica específica
-                options: ['Vodka', 'Ron', 'Ginebra', 'Whisky', 'Tequila', 'Coca-Cola', 'Sprite', 'Tónica', 'Hielo'],
+                options: ['Vodka', 'Ron', 'Ginebra', 'Whisky', 'Tequila', 'Coca-Cola', 'Sprite', 'Tónica', 'Hielo', 'Red Bull', 'OTRO'],
                 unit: 'ml/L'
             },
             musica: { 
                 icon: '🎵', 
                 label: 'Música', 
                 desc: 'Playlist y sonido',
-                type: 'music',
-                options: ['Altavoz Bluetooth', 'Mesa de mezclas', 'Micrófono', 'Cable Aux', 'Playlist Spotify'],
+                options: ['Altavoz Bluetooth', 'Mesa de mezclas', 'Micrófono', 'Cable Aux', 'Playlist Spotify', 'OTRO'],
                 unit: 'info'
             },
             logistica: { 
                 icon: '🚚', 
                 label: 'Logística', 
                 desc: 'Transporte y cargas',
-                type: 'generic',
-                options: [],
+                options: [], // Genérico, usa input manual
                 unit: 'personas/kg'
             },
             snacks: { 
                 icon: '🍪', 
                 label: 'Snacks', 
                 desc: 'Picoteo vario',
-                type: 'snacks',
-                options: ['Munchitos', 'Gusanitos', 'Papas Lays', 'Doritos', 'Aceitunas', 'Frutos Secos', 'Gominolas'],
+                options: ['Munchitos', 'Gusanitos', 'Papas Lays', 'Doritos', 'Aceitunas', 'Frutos Secos', 'Gominolas', 'OTRO'],
                 unit: 'bolsas'
             },
             menaje: { 
                 icon: '🍴', 
                 label: 'Menaje', 
                 desc: 'Material de consumo',
-                type: 'generic',
-                options: ['Vasos tubo', 'Vasos chupito', 'Platos', 'Servilletas', 'Tenedores'],
+                options: ['Vasos tubo', 'Vasos chupito', 'Platos', 'Servilletas', 'Tenedores', 'OTRO'],
                 unit: 'unidades'
             }
         };
@@ -96,7 +89,7 @@
             const [hasChanges, setHasChanges] = React.useState(false);
             const [error, setError] = React.useState('');
             
-            // Estado para los inputs temporales de añadir items
+            // Estado para los inputs temporales
             const [tempInputs, setTempInputs] = React.useState({});
 
             React.useEffect(() => {
@@ -165,26 +158,36 @@
                 setHasChanges(true);
             };
 
-            // Función para añadir items desde los desplegables
             const addItem = (taskId, config) => {
                 const inputs = tempInputs[taskId] || {};
-                const item = inputs.item || (config.options[0] || '');
+                
+                // Lógica inteligente para determinar el nombre del item
+                let itemName = inputs.selectedOption || (config.options.length > 0 ? config.options[0] : '');
+                
+                // Si seleccionó OTRO, usamos el campo personalizado
+                if (itemName === 'OTRO') {
+                    itemName = inputs.customName;
+                } 
+                // Si no hay opciones (caso logística), usamos el input directo (inputs.item)
+                else if (config.options.length === 0) {
+                    itemName = inputs.item;
+                }
+
                 const qty = inputs.qty || '';
 
-                if (!item) return;
+                if (!itemName) return;
 
-                const textToAdd = `• ${item}: ${qty} ${config.unit !== 'info' ? config.unit : ''}`;
+                const textToAdd = `• ${itemName}: ${qty} ${config.unit !== 'info' ? config.unit : ''}`;
                 
-                // Añadimos al texto existente con un salto de línea
                 const currentDetails = tasks[taskId].details || '';
                 const newDetails = currentDetails ? `${currentDetails}\n${textToAdd}` : textToAdd;
 
                 handleDetailChange(taskId, newDetails);
                 
-                // Limpiar inputs
+                // Resetear inputs después de añadir
                 setTempInputs(prev => ({
                     ...prev, 
-                    [taskId]: { ...prev[taskId], qty: '' } 
+                    [taskId]: { ...prev[taskId], qty: '', customName: '', item: '' } 
                 }));
             };
 
@@ -225,19 +228,19 @@
                             const config = TASK_CONFIG[key];
                             const isAssigned = task.assignedTo.includes(user);
                             const inputs = tempInputs[key] || {};
+                            
+                            // Determinar valor por defecto del select
                             const defaultOption = config.options.length > 0 ? config.options[0] : '';
+                            const currentSelection = inputs.selectedOption || defaultOption;
 
                             return (
                                 <div key={key} className={`rounded-xl border transition-all duration-300 ${isAssigned ? 'bg-card border-gray-600 shadow-lg' : 'bg-dark border-gray-800 opacity-90'}`}>
                                     <div className="p-4">
-                                        {/* Cabecera Tarea */}
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-center gap-3">
                                                 <span className="text-2xl">{config.icon}</span>
                                                 <div>
                                                     <h3 className={`font-bold text-lg ${isAssigned ? 'text-white' : 'text-gray-400'}`}>{config.label}</h3>
-                                                    
-                                                    {/* Lista de responsables */}
                                                     <div className="flex flex-wrap gap-1 mt-1">
                                                         {task.assignedTo.map(p => (
                                                             <span key={p} className="text-[10px] bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded border border-gray-600">
@@ -259,62 +262,82 @@
                                             </button>
                                         </div>
 
-                                        {/* Área de Edición (Condicional) */}
                                         {isAssigned ? (
                                             <div className="space-y-3 animate-fade-in">
                                                 
-                                                {/* GENERADOR DE ITEMS (Desplegables) */}
-                                                <div className="bg-dark/50 p-2 rounded-lg border border-gray-700 flex gap-2 items-end">
-                                                    <div className="flex-1">
-                                                        <label className="text-[10px] text-gray-500 uppercase block mb-1">Item</label>
-                                                        {config.options.length > 0 ? (
-                                                            <select 
-                                                                className="w-full bg-card text-sm text-gray-300 p-1.5 rounded border border-gray-600 outline-none focus:border-gold"
-                                                                onChange={(e) => updateTempInput(key, 'item', e.target.value)}
-                                                                value={inputs.item || defaultOption}
-                                                            >
-                                                                {config.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                                                            </select>
-                                                        ) : (
+                                                {/* BARRA DE HERRAMIENTAS INTELIGENTE */}
+                                                <div className="bg-dark/50 p-2 rounded-lg border border-gray-700 flex flex-col gap-2">
+                                                    
+                                                    <div className="flex gap-2 items-end">
+                                                        {/* Input Principal: Select o Texto Libre */}
+                                                        <div className="flex-1">
+                                                            <label className="text-[10px] text-gray-500 uppercase block mb-1">¿Qué llevas?</label>
+                                                            {config.options.length > 0 ? (
+                                                                <select 
+                                                                    className="w-full bg-card text-sm text-gray-300 p-1.5 rounded border border-gray-600 outline-none focus:border-gold"
+                                                                    onChange={(e) => updateTempInput(key, 'selectedOption', e.target.value)}
+                                                                    value={currentSelection}
+                                                                >
+                                                                    {config.options.map(opt => (
+                                                                        <option key={opt} value={opt}>
+                                                                            {opt === 'OTRO' ? '✏️ Otro/Personalizado...' : opt}
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                            ) : (
+                                                                <input 
+                                                                    type="text" 
+                                                                    placeholder="Nombre del item..."
+                                                                    className="w-full bg-card text-sm text-gray-300 p-1.5 rounded border border-gray-600 outline-none focus:border-gold"
+                                                                    onChange={(e) => updateTempInput(key, 'item', e.target.value)}
+                                                                    value={inputs.item || ''}
+                                                                />
+                                                            )}
+                                                        </div>
+                                                        
+                                                        {/* Cantidad */}
+                                                        <div className="w-24">
+                                                            <label className="text-[10px] text-gray-500 uppercase block mb-1">Cant. {config.unit !== 'info' ? `(${config.unit})` : ''}</label>
                                                             <input 
                                                                 type="text" 
-                                                                placeholder="Nombre del item..."
+                                                                placeholder="0"
                                                                 className="w-full bg-card text-sm text-gray-300 p-1.5 rounded border border-gray-600 outline-none focus:border-gold"
-                                                                onChange={(e) => updateTempInput(key, 'item', e.target.value)}
-                                                                value={inputs.item || ''}
+                                                                onChange={(e) => updateTempInput(key, 'qty', e.target.value)}
+                                                                value={inputs.qty || ''}
                                                             />
-                                                        )}
+                                                        </div>
+                                                        
+                                                        <button 
+                                                            onClick={() => addItem(key, config)}
+                                                            className="bg-gray-700 hover:bg-gold hover:text-dark text-white p-1.5 rounded border border-gray-600 transition-colors h-[34px] w-[34px] flex items-center justify-center"
+                                                        >
+                                                            ➕
+                                                        </button>
                                                     </div>
-                                                    
-                                                    <div className="w-24">
-                                                        <label className="text-[10px] text-gray-500 uppercase block mb-1">Cant. ({config.unit})</label>
-                                                        <input 
-                                                            type="text" 
-                                                            placeholder="0"
-                                                            className="w-full bg-card text-sm text-gray-300 p-1.5 rounded border border-gray-600 outline-none focus:border-gold"
-                                                            onChange={(e) => updateTempInput(key, 'qty', e.target.value)}
-                                                            value={inputs.qty || ''}
-                                                        />
-                                                    </div>
-                                                    
-                                                    <button 
-                                                        onClick={() => addItem(key, config)}
-                                                        className="bg-gray-700 hover:bg-gold hover:text-dark text-white p-1.5 rounded border border-gray-600 transition-colors"
-                                                    >
-                                                        ➕
-                                                    </button>
+
+                                                    {/* INPUT ADICIONAL: Aparece solo si eliges OTRO */}
+                                                    {currentSelection === 'OTRO' && (
+                                                        <div className="animate-fade-in">
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder="Escribe el nombre del item personalizado..."
+                                                                autoFocus
+                                                                className="w-full bg-card text-sm text-gold p-1.5 rounded border border-gold/50 outline-none placeholder-gray-600"
+                                                                onChange={(e) => updateTempInput(key, 'customName', e.target.value)}
+                                                                value={inputs.customName || ''}
+                                                            />
+                                                        </div>
+                                                    )}
                                                 </div>
 
-                                                {/* Textarea (editable manual también) */}
                                                 <textarea
                                                     value={task.details}
                                                     onChange={(e) => handleDetailChange(key, e.target.value)}
                                                     className="w-full bg-dark text-sm text-gray-300 p-3 rounded-lg border border-gray-700 focus:border-gold outline-none h-24 font-mono leading-relaxed"
-                                                    placeholder="Usa los controles de arriba o escribe aquí..."
+                                                    placeholder="La lista se irá creando aquí..."
                                                 />
                                             </div>
                                         ) : (
-                                            /* Mensaje de Bloqueo */
                                             <div className="bg-dark/30 p-3 rounded-lg border border-dashed border-gray-700 text-center">
                                                 <p className="text-gray-500 text-xs flex items-center justify-center gap-2">
                                                     🔒 Apúntate para gestionar {config.label.toLowerCase()}
@@ -327,7 +350,6 @@
                         })}
                     </div>
 
-                    {/* Botón Guardar Flotante */}
                     {hasChanges && (
                         <div className="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-50">
                             <button
@@ -352,4 +374,3 @@
     </script>
 </body>
 </html>
-
