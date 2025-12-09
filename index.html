@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Fin de Año 2025 | Presupuestos</title>
+    <title>Fin de Año 2025 | Presupuestos V5</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -67,12 +67,12 @@
             musica: { 
                 icon: '🎵', label: 'Música', desc: 'Sonido y ambiente', 
                 options: ['Altavoz', 'Cableado', 'Luces', 'Playlist', 'OTRO'], 
-                unit: 'Info', budget: 20 // Incluye logística según indicación
+                unit: 'Info', budget: 20 
             },
             logistica: { 
                 icon: '🚘', label: 'Logística', desc: 'Transporte', 
                 options: [], 
-                unit: '', budget: 0 // Presupuesto compartido con música
+                unit: '', budget: 0 
             },
             snacks: { 
                 icon: '🍪', label: 'Snacks', desc: 'Picoteo', 
@@ -95,9 +95,8 @@
             );
         };
 
-        // --- BARRA DE PRESUPUESTO ---
         const BudgetBar = ({ current, max }) => {
-            if (max === 0) return null; // Si no hay presupuesto asignado
+            if (max === 0) return null; 
             const percentage = Math.min((current / max) * 100, 100);
             const isOver = current > max;
             const remaining = max - current;
@@ -137,10 +136,6 @@
                         const defaultOption = config.options.length > 0 ? config.options[0] : '';
                         const currentSelection = inputs.selectedOption || defaultOption;
 
-                        // Cálculo especial para logística/música que comparten presupuesto
-                        let displayBudget = config.budget;
-                        if (key === 'logistica') displayBudget = 0; // Mostrar solo en música o manejar visualmente
-
                         return (
                             <div key={key} className={`glass-panel rounded-xl overflow-hidden transition-all duration-300 ${isAssigned ? 'border-gold/40 shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'opacity-85'}`}>
                                 <div className="p-5">
@@ -161,14 +156,10 @@
                                         </button>
                                     </div>
 
-                                    {/* BARRA DE PRESUPUESTO SIEMPRE VISIBLE */}
-                                    {config.budget > 0 && (
-                                        <BudgetBar current={task.cost || 0} max={config.budget} />
-                                    )}
+                                    {config.budget > 0 && <BudgetBar current={task.cost || 0} max={config.budget} />}
 
                                     {isAssigned ? (
                                         <div className="space-y-4 animate-fade-in bg-black/20 p-3 rounded-lg border border-white/5">
-                                            {/* HERRAMIENTAS */}
                                             <div className="flex flex-col gap-2">
                                                 <div className="flex gap-2 items-end">
                                                     <div className="flex-1">
@@ -202,17 +193,19 @@
                                             </div>
 
                                             <textarea value={task.details} onChange={(e) => handleDetailChange(key, e.target.value)}
-                                                className="w-full bg-transparent text-sm text-gray-300 p-2 rounded border border-gray-700/50 focus:border-gold outline-none h-20 font-mono leading-relaxed placeholder-gray-700"
+                                                className="w-full bg-transparent text-sm text-gray-300 p-2 rounded border border-gray-700/50 focus:border-gold outline-none h-32 font-mono leading-relaxed placeholder-gray-700"
                                                 placeholder="Lista de items..." />
                                             
-                                            {/* EDITOR MANUAL DE COSTE TOTAL */}
-                                            <div className="flex items-center gap-2 border-t border-white/5 pt-2">
-                                                <label className="text-[10px] text-gray-500 uppercase">Corrección manual Total (€):</label>
-                                                <input type="number" 
-                                                    value={task.cost || 0} 
-                                                    onChange={(e) => handleCostChange(key, e.target.value)}
-                                                    className="bg-transparent text-gold font-bold w-20 text-right focus:outline-none border-b border-white/10 focus:border-gold"
-                                                />
+                                            <div className="flex items-center gap-2 border-t border-white/5 pt-2 justify-between">
+                                                <span className="text-[10px] text-gray-500 uppercase italic">El coste se calcula automáticamente según el texto</span>
+                                                <div className="flex items-center gap-2">
+                                                    <label className="text-[10px] text-gold uppercase font-bold">TOTAL (€):</label>
+                                                    <input type="number" 
+                                                        value={task.cost || 0} 
+                                                        onChange={(e) => handleCostChange(key, e.target.value)}
+                                                        className="bg-transparent text-gold font-bold w-16 text-right focus:outline-none border-b border-white/10 focus:border-gold"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (
@@ -291,6 +284,20 @@
             React.useEffect(() => { fetchData(); }, []);
             const showToast = (msg, type = 'success') => setToast({ message: msg, type });
 
+            // --- LÓGICA DE ESCANEO DE PRECIOS ---
+            const calculateCostFromText = (text) => {
+                if (!text) return 0;
+                // Busca patrón (Est. XX.XX€) o (Est. XX€)
+                const regex = /\(Est\.\s*([\d\.]+)\s*€\)/g;
+                let total = 0;
+                let match;
+                while ((match = regex.exec(text)) !== null) {
+                    const val = parseFloat(match[1]);
+                    if (!isNaN(val)) total += val;
+                }
+                return total;
+            };
+
             const fetchData = async () => {
                 try {
                     const response = await fetch(API_URL);
@@ -306,7 +313,7 @@
                     const params = new URLSearchParams({ action: 'save', data: JSON.stringify(tasks) });
                     const response = await fetch(`${API_URL}?${params.toString()}`);
                     const result = await response.json();
-                    if (result.success) { setHasChanges(false); showToast('Datos y costes actualizados'); } else throw new Error();
+                    if (result.success) { setHasChanges(false); showToast('Datos guardados correctamente'); } else throw new Error();
                 } catch (err) { showToast('Error al guardar', 'error'); } finally { setSaving(false); }
             };
 
@@ -320,8 +327,17 @@
                 setHasChanges(true);
             };
 
+            // MODIFICADO: Ahora recalcula el coste cada vez que el texto cambia
             const handleDetailChange = (taskId, value) => {
-                setTasks(prev => ({ ...prev, [taskId]: { ...prev[taskId], details: value } }));
+                const newCost = calculateCostFromText(value);
+                setTasks(prev => ({ 
+                    ...prev, 
+                    [taskId]: { 
+                        ...prev[taskId], 
+                        details: value,
+                        cost: newCost // Auto actualización del coste
+                    } 
+                }));
                 setHasChanges(true);
             };
 
@@ -338,32 +354,20 @@
                 else if (config.options.length === 0) itemName = inputs.item;
 
                 const qty = inputs.qty || '';
-                const priceEst = parseFloat(inputs.price) || 0; // Capturamos el precio
-                const priceText = priceEst > 0 ? `(${priceEst}€)` : '';
+                const priceEst = parseFloat(inputs.price) || 0; 
+                const priceText = priceEst > 0 ? `(Est. ${priceEst}€)` : '';
 
                 if (!itemName) return;
 
                 const textToAdd = `• ${itemName}: ${qty} ${config.unit.replace('/Info','')} ${priceText}`;
                 
-                // Actualizar texto
                 const currentDetails = tasks[taskId].details || '';
                 const newDetails = currentDetails ? `${currentDetails}\n${textToAdd}` : textToAdd;
                 
-                // Actualizar Coste Total (Suma automática)
-                const currentCost = tasks[taskId].cost || 0;
-                const newCost = currentCost + priceEst;
-
-                setTasks(prev => ({
-                    ...prev,
-                    [taskId]: { 
-                        ...prev[taskId], 
-                        details: newDetails,
-                        cost: newCost 
-                    }
-                }));
-                setHasChanges(true);
+                // NOTA: No sumamos el coste aquí manualmente,
+                // llamamos a handleDetailChange que lo escaneará del texto.
+                handleDetailChange(taskId, newDetails);
                 
-                // Reset inputs
                 setTempInputs(prev => ({ ...prev, [taskId]: { ...prev[taskId], qty: '', customName: '', item: '', price: '' } }));
             };
 
@@ -417,4 +421,3 @@
     </script>
 </body>
 </html>
-
