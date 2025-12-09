@@ -15,7 +15,8 @@
                     colors: {
                         gold: '#D4AF37',
                         dark: '#121212',
-                        card: '#1E1E1E'
+                        card: '#1E1E1E',
+                        cardhover: '#252525'
                     }
                 }
             }
@@ -24,33 +25,67 @@
     <style>
         body { background-color: #121212; color: #E0E0E0; }
         .gold-gradient { background: linear-gradient(135deg, #D4AF37 0%, #C5A028 100%); }
-        .glass { background: rgba(30, 30, 30, 0.95); backdrop-filter: blur(10px); }
-        /* Animación para el botón de guardar */
-        @keyframes pulse-gold {
-            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
-        }
-        .animate-pulse-gold {
-            animation: pulse-gold 2s infinite;
-        }
+        /* Animación suave para el candado */
+        .fade-enter { opacity: 0; }
+        .fade-enter-active { opacity: 1; transition: opacity 300ms; }
+        /* Scrollbar personalizada */
+        textarea::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track { background: #121212; }
+        textarea::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel">
-        // ⚠️ PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT NUEVA
-        const API_URL = 'https://script.google.com/macros/s/AKfycbynd1X7GcM7qUTCZRx9aVUMC6YpfBQJTJCkydse4ILCK6SppVXFn70EmpvPveH9UXia5Q/exec';
+        // ⚠️ ASEGÚRATE DE QUE ESTA URL ES LA CORRECTA DE TU PROYECTO
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxn5Yk7puVurgFr8KIC5jW_x3cmAUyQYZgD-RbkM_6MbIEWlfAva2JdE2a6M7Btk0vZIw/exec';
 
         const USERS = ['Juan', 'Quintana', 'Germán', 'Jose', 'Cantero', 'Alejandro', 'David', 'Jorge', 'Arbelo'];
         
+        // Configuración específica por tarea
         const TASK_CONFIG = {
-            alcohol: { icon: '🍷', label: 'Alcohol', desc: 'Bebidas espirituosas y refrescos' },
-            musica: { icon: '🎵', label: 'Música', desc: 'Playlist y equipo de sonido' },
-            logistica: { icon: '🚚', label: 'Logística', desc: 'Transporte y organización' },
-            snacks: { icon: '🍪', label: 'Snacks', desc: 'Aperitivos y picoteo' },
-            menaje: { icon: '🍴', label: 'Menaje', desc: 'Vasos, platos, hielo, etc.' }
+            alcohol: { 
+                icon: '🍷', 
+                label: 'Alcohol', 
+                desc: 'Bebidas y mezclas',
+                type: 'alcohol', // Para lógica específica
+                options: ['Vodka', 'Ron', 'Ginebra', 'Whisky', 'Tequila', 'Coca-Cola', 'Sprite', 'Tónica', 'Hielo'],
+                unit: 'ml/L'
+            },
+            musica: { 
+                icon: '🎵', 
+                label: 'Música', 
+                desc: 'Playlist y sonido',
+                type: 'music',
+                options: ['Altavoz Bluetooth', 'Mesa de mezclas', 'Micrófono', 'Cable Aux', 'Playlist Spotify'],
+                unit: 'info'
+            },
+            logistica: { 
+                icon: '🚚', 
+                label: 'Logística', 
+                desc: 'Transporte y cargas',
+                type: 'generic',
+                options: [],
+                unit: 'personas/kg'
+            },
+            snacks: { 
+                icon: '🍪', 
+                label: 'Snacks', 
+                desc: 'Picoteo vario',
+                type: 'snacks',
+                options: ['Munchitos', 'Gusanitos', 'Papas Lays', 'Doritos', 'Aceitunas', 'Frutos Secos', 'Gominolas'],
+                unit: 'bolsas'
+            },
+            menaje: { 
+                icon: '🍴', 
+                label: 'Menaje', 
+                desc: 'Material de consumo',
+                type: 'generic',
+                options: ['Vasos tubo', 'Vasos chupito', 'Platos', 'Servilletas', 'Tenedores'],
+                unit: 'unidades'
+            }
         };
 
         function App() {
@@ -58,10 +93,12 @@
             const [tasks, setTasks] = React.useState({});
             const [loading, setLoading] = React.useState(true);
             const [saving, setSaving] = React.useState(false);
-            const [hasChanges, setHasChanges] = React.useState(false); // Nuevo estado para controlar cambios locales
+            const [hasChanges, setHasChanges] = React.useState(false);
             const [error, setError] = React.useState('');
+            
+            // Estado para los inputs temporales de añadir items
+            const [tempInputs, setTempInputs] = React.useState({});
 
-            // Cargar datos al inicio
             React.useEffect(() => {
                 fetchData();
             }, []);
@@ -75,42 +112,36 @@
                     setHasChanges(false);
                 } catch (err) {
                     console.error("Error cargando:", err);
-                    setError('Error al cargar datos. Intenta recargar.');
+                    setError('Error de conexión. Recarga la página.');
                 } finally {
                     setLoading(false);
                 }
             };
 
-            // Función MODIFICADA: Ahora solo guarda en local y activa la bandera "hasChanges"
             const saveData = async () => {
                 setSaving(true);
                 try {
-                    // Usamos la estrategia GET con parámetros para evitar CORS
                     const params = new URLSearchParams({
                         action: 'save',
                         data: JSON.stringify(tasks)
                     });
-                    
                     const response = await fetch(`${API_URL}?${params.toString()}`);
                     const result = await response.json();
                     
                     if (result.success) {
-                        setHasChanges(false); // Reseteamos bandera de cambios
-                        // Opcional: Recargar datos para asegurar sincronización
-                        // await fetchData(); 
+                        setHasChanges(false);
                     } else {
                         throw new Error(result.error || 'Error desconocido');
                     }
                 } catch (err) {
-                    console.error("Error guardando:", err);
-                    alert('Error al guardar. Por favor intenta de nuevo.');
+                    alert('Error al guardar. Intenta de nuevo.');
                 } finally {
                     setSaving(false);
                 }
             };
 
             const toggleAssignment = (taskId) => {
-                if (!user) return alert('Selecciona tu nombre primero');
+                if (!user) return alert('⚠️ Selecciona tu nombre arriba primero');
                 
                 setTasks(prev => {
                     const current = prev[taskId].assignedTo;
@@ -123,7 +154,7 @@
                         [taskId]: { ...prev[taskId], assignedTo: newAssigned }
                     };
                 });
-                setHasChanges(true); // Marcamos que hay cambios sin guardar
+                setHasChanges(true);
             };
 
             const handleDetailChange = (taskId, value) => {
@@ -131,120 +162,185 @@
                     ...prev,
                     [taskId]: { ...prev[taskId], details: value }
                 }));
-                setHasChanges(true); // Marcamos que hay cambios sin guardar
+                setHasChanges(true);
+            };
+
+            // Función para añadir items desde los desplegables
+            const addItem = (taskId, config) => {
+                const inputs = tempInputs[taskId] || {};
+                const item = inputs.item || (config.options[0] || '');
+                const qty = inputs.qty || '';
+
+                if (!item) return;
+
+                const textToAdd = `• ${item}: ${qty} ${config.unit !== 'info' ? config.unit : ''}`;
+                
+                // Añadimos al texto existente con un salto de línea
+                const currentDetails = tasks[taskId].details || '';
+                const newDetails = currentDetails ? `${currentDetails}\n${textToAdd}` : textToAdd;
+
+                handleDetailChange(taskId, newDetails);
+                
+                // Limpiar inputs
+                setTempInputs(prev => ({
+                    ...prev, 
+                    [taskId]: { ...prev[taskId], qty: '' } 
+                }));
+            };
+
+            const updateTempInput = (taskId, field, value) => {
+                setTempInputs(prev => ({
+                    ...prev,
+                    [taskId]: { ...prev[taskId] || {}, [field]: value }
+                }));
             };
 
             if (loading && !tasks.alcohol) return (
-                <div className="min-h-screen flex items-center justify-center text-gold">
-                    <div className="text-2xl animate-pulse">Cargando fiesta... ✨</div>
+                <div className="min-h-screen flex items-center justify-center text-gold bg-dark">
+                    <div className="text-xl animate-pulse">Cargando datos...</div>
                 </div>
             );
 
             return (
-                <div className="min-h-screen pb-24 px-4 py-8 max-w-2xl mx-auto font-sans">
-                    {/* Header */}
+                <div className="min-h-screen pb-32 px-4 py-8 max-w-2xl mx-auto font-sans bg-dark">
                     <div className="text-center mb-8">
-                        <h1 className="text-4xl font-bold text-gold mb-2 tracking-wider">FIN DE AÑO 2025</h1>
-                        <p className="text-gray-400 text-sm tracking-widest uppercase">Organizador de Etiqueta</p>
+                        <h1 className="text-3xl font-bold text-gold mb-1">FIN DE AÑO 2025</h1>
+                        <p className="text-gray-500 text-xs tracking-widest uppercase">Planning Oficial</p>
                     </div>
 
-                    {/* Selector de Usuario */}
-                    <div className="mb-8 bg-card p-4 rounded-xl border border-gray-800 shadow-lg">
-                        <label className="block text-gray-400 text-xs uppercase tracking-wider mb-2">Soy:</label>
+                    <div className="mb-6 bg-card p-4 rounded-xl border border-gray-800">
+                        <label className="block text-gold text-xs font-bold uppercase mb-2">👤 Identifícate:</label>
                         <select 
                             value={user} 
                             onChange={(e) => setUser(e.target.value)}
-                            className="w-full bg-dark text-white p-3 rounded-lg border border-gray-700 focus:border-gold focus:outline-none transition-colors"
+                            className="w-full bg-dark text-white p-3 rounded-lg border border-gray-700 focus:border-gold outline-none"
                         >
                             <option value="">Selecciona tu nombre...</option>
                             {USERS.map(u => <option key={u} value={u}>{u}</option>)}
                         </select>
                     </div>
 
-                    {/* Lista de Tareas */}
                     <div className="space-y-4">
-                        {Object.entries(tasks).map(([key, task]) => (
-                            <div key={key} className="bg-card rounded-xl overflow-hidden border border-gray-800 shadow-lg transition-all hover:border-gray-700">
-                                <div className="p-4">
-                                    <div className="flex items-start justify-between mb-3">
-                                        <div className="flex items-center gap-3">
-                                            <span className="text-2xl">{TASK_CONFIG[key].icon}</span>
-                                            <div>
-                                                <h3 className="font-bold text-lg text-gray-200">{TASK_CONFIG[key].label}</h3>
-                                                <p className="text-xs text-gray-500">{TASK_CONFIG[key].desc}</p>
-                                            </div>
-                                        </div>
-                                        <button 
-                                            onClick={() => toggleAssignment(key)}
-                                            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${
-                                                task.assignedTo.includes(user)
-                                                ? 'bg-gold text-dark hover:bg-white'
-                                                : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                            }`}
-                                        >
-                                            {task.assignedTo.includes(user) ? 'Apuntado ✓' : 'Apuntarme'}
-                                        </button>
-                                    </div>
+                        {Object.entries(tasks).map(([key, task]) => {
+                            const config = TASK_CONFIG[key];
+                            const isAssigned = task.assignedTo.includes(user);
+                            const inputs = tempInputs[key] || {};
+                            const defaultOption = config.options.length > 0 ? config.options[0] : '';
 
-                                    {/* Responsables */}
-                                    <div className="mb-3 flex flex-wrap gap-2">
-                                        {task.assignedTo.length > 0 ? (
-                                            task.assignedTo.map(person => (
-                                                <span key={person} className="bg-gray-800 text-gray-300 text-xs px-2 py-1 rounded border border-gray-700">
-                                                    {person}
-                                                </span>
-                                            ))
+                            return (
+                                <div key={key} className={`rounded-xl border transition-all duration-300 ${isAssigned ? 'bg-card border-gray-600 shadow-lg' : 'bg-dark border-gray-800 opacity-90'}`}>
+                                    <div className="p-4">
+                                        {/* Cabecera Tarea */}
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex items-center gap-3">
+                                                <span className="text-2xl">{config.icon}</span>
+                                                <div>
+                                                    <h3 className={`font-bold text-lg ${isAssigned ? 'text-white' : 'text-gray-400'}`}>{config.label}</h3>
+                                                    
+                                                    {/* Lista de responsables */}
+                                                    <div className="flex flex-wrap gap-1 mt-1">
+                                                        {task.assignedTo.map(p => (
+                                                            <span key={p} className="text-[10px] bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded border border-gray-600">
+                                                                {p}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button 
+                                                onClick={() => toggleAssignment(key)}
+                                                className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${
+                                                    isAssigned 
+                                                    ? 'bg-red-900/50 text-red-200 border border-red-800 hover:bg-red-900' 
+                                                    : 'bg-gold text-dark hover:bg-white'
+                                                }`}
+                                            >
+                                                {isAssigned ? 'Salir' : 'Apuntarme'}
+                                            </button>
+                                        </div>
+
+                                        {/* Área de Edición (Condicional) */}
+                                        {isAssigned ? (
+                                            <div className="space-y-3 animate-fade-in">
+                                                
+                                                {/* GENERADOR DE ITEMS (Desplegables) */}
+                                                <div className="bg-dark/50 p-2 rounded-lg border border-gray-700 flex gap-2 items-end">
+                                                    <div className="flex-1">
+                                                        <label className="text-[10px] text-gray-500 uppercase block mb-1">Item</label>
+                                                        {config.options.length > 0 ? (
+                                                            <select 
+                                                                className="w-full bg-card text-sm text-gray-300 p-1.5 rounded border border-gray-600 outline-none focus:border-gold"
+                                                                onChange={(e) => updateTempInput(key, 'item', e.target.value)}
+                                                                value={inputs.item || defaultOption}
+                                                            >
+                                                                {config.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                                                            </select>
+                                                        ) : (
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder="Nombre del item..."
+                                                                className="w-full bg-card text-sm text-gray-300 p-1.5 rounded border border-gray-600 outline-none focus:border-gold"
+                                                                onChange={(e) => updateTempInput(key, 'item', e.target.value)}
+                                                                value={inputs.item || ''}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    
+                                                    <div className="w-24">
+                                                        <label className="text-[10px] text-gray-500 uppercase block mb-1">Cant. ({config.unit})</label>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="0"
+                                                            className="w-full bg-card text-sm text-gray-300 p-1.5 rounded border border-gray-600 outline-none focus:border-gold"
+                                                            onChange={(e) => updateTempInput(key, 'qty', e.target.value)}
+                                                            value={inputs.qty || ''}
+                                                        />
+                                                    </div>
+                                                    
+                                                    <button 
+                                                        onClick={() => addItem(key, config)}
+                                                        className="bg-gray-700 hover:bg-gold hover:text-dark text-white p-1.5 rounded border border-gray-600 transition-colors"
+                                                    >
+                                                        ➕
+                                                    </button>
+                                                </div>
+
+                                                {/* Textarea (editable manual también) */}
+                                                <textarea
+                                                    value={task.details}
+                                                    onChange={(e) => handleDetailChange(key, e.target.value)}
+                                                    className="w-full bg-dark text-sm text-gray-300 p-3 rounded-lg border border-gray-700 focus:border-gold outline-none h-24 font-mono leading-relaxed"
+                                                    placeholder="Usa los controles de arriba o escribe aquí..."
+                                                />
+                                            </div>
                                         ) : (
-                                            <span className="text-gray-600 text-xs italic">Sin responsables aún</span>
+                                            /* Mensaje de Bloqueo */
+                                            <div className="bg-dark/30 p-3 rounded-lg border border-dashed border-gray-700 text-center">
+                                                <p className="text-gray-500 text-xs flex items-center justify-center gap-2">
+                                                    🔒 Apúntate para gestionar {config.label.toLowerCase()}
+                                                </p>
+                                            </div>
                                         )}
                                     </div>
-
-                                    {/* Detalles (Textarea) */}
-                                    <textarea
-                                        value={task.details}
-                                        onChange={(e) => handleDetailChange(key, e.target.value)}
-                                        placeholder={`Detalles sobre ${TASK_CONFIG[key].label.toLowerCase()}...`}
-                                        className="w-full bg-dark text-sm text-gray-300 p-3 rounded-lg border border-gray-800 focus:border-gold focus:outline-none transition-colors resize-none h-20"
-                                    />
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
 
-                    {/* BOTÓN FLOTANTE DE GUARDAR - Solo visible si hay cambios o está guardando */}
-                    <div className="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-50">
-                        {hasChanges && (
+                    {/* Botón Guardar Flotante */}
+                    {hasChanges && (
+                        <div className="fixed bottom-6 left-0 right-0 px-4 flex justify-center z-50">
                             <button
                                 onClick={saveData}
                                 disabled={saving}
                                 className={`
                                     flex items-center gap-2 px-8 py-4 rounded-full font-bold shadow-2xl text-dark text-lg
-                                    transform transition-all duration-300 hover:scale-105
-                                    ${saving ? 'bg-gray-400 cursor-wait' : 'gold-gradient animate-pulse-gold cursor-pointer'}
+                                    transition-all duration-300 hover:scale-105 border-2 border-white/20
+                                    ${saving ? 'bg-gray-400' : 'gold-gradient animate-pulse'}
                                 `}
                             >
-                                {saving ? (
-                                    <>⏳ Guardando...</>
-                                ) : (
-                                    <>💾 Guardar Cambios</>
-                                )}
+                                {saving ? '⏳ Guardando...' : '💾 GUARDAR CAMBIOS'}
                             </button>
-                        )}
-                        
-                        {/* Botón de recargar (siempre visible pero discreto si no hay cambios) */}
-                        {!hasChanges && !loading && (
-                            <button
-                                onClick={fetchData}
-                                className="bg-gray-800 text-gray-400 px-6 py-3 rounded-full text-sm border border-gray-700 shadow-xl flex items-center gap-2 hover:bg-gray-700 hover:text-white transition-all"
-                            >
-                                🔄 Ver si hay novedades
-                            </button>
-                        )}
-                    </div>
-                    
-                    {error && (
-                        <div className="fixed top-4 left-4 right-4 bg-red-900/90 text-white p-3 rounded-lg text-center text-sm border border-red-500">
-                            {error}
                         </div>
                     )}
                 </div>
@@ -256,5 +352,3 @@
     </script>
 </body>
 </html>
-
-
