@@ -4,7 +4,7 @@ export default defineConfig({
     base: '/findeano2025.github.io/',
     root: 'public',
     build: {
-        outDir: '../dist/public',
+        outDir: '../dist',
         emptyOutDir: true
     }
 })
