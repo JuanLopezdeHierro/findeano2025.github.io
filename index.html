@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fin de Año 2025 - Organizador de Fiesta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#D4AF37',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #e5e5e5;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-4xl font-bold text-center mb-8 text-primary">
+            🎉 Fin de Año 2025
+        </h1>
+
+        <div class="mb-8">
+            <label class="block mb-2">Selecciona tu nombre:</label>
+            <select id="userSelect" class="w-full p-2 bg-gray-800 border border-gray-700 rounded">
+                <option value="">-- Selecciona --</option>
+                <option value="Juan">Juan</option>
+                <option value="Quintana">Quintana</option>
+                <option value="Alejandro">Alejandro</option>
+                <option value="Arbelo">Arbelo</option>
+                <option value="Cantero">Cantero</option>
+                <option value="Germán">Germán</option>
+                <option value="David">David</option>
+                <option value="Jorge">Jorge</option>
+                <option value="Jose">Jose (Anfitrión)</option>
+            </select>
+        </div>
+
+        <div class="grid gap-4">
+            <h2 class="text-2xl font-bold">Tareas del Evento</h2>
+
+            <!-- Alcohol -->
+            <div class="p-4 bg-gray-800 rounded">
+                <h3 class="text-xl mb-2">🍷 Alcohol</h3>
+                <button class="px-4 py-2 bg-primary text-black rounded hover:bg-yellow-600">
+                    Apuntarse
+                </button>
+            </div>
+
+            <!-- Snacks -->
+            <div class="p-4 bg-gray-800 rounded">
+                <h3 class="text-xl mb-2">🍪 Snacks</h3>
+                <button class="px-4 py-2 bg-primary text-black rounded hover:bg-yellow-600">
+                    Apuntarse
+                </button>
+            </div>
+
+            <!-- Menaje -->
+            <div class="p-4 bg-gray-800 rounded">
+                <h3 class="text-xl mb-2">🍽️ Menaje</h3>
+                <button class="px-4 py-2 bg-primary text-black rounded hover:bg-yellow-600">
+                    Apuntarse
+                </button>
+            </div>
+
+            <!-- Música -->
+            <div class="p-4 bg-gray-800 rounded">
+                <h3 class="text-xl mb-2">🎵 Música</h3>
+                <button class="px-4 py-2 bg-primary text-black rounded hover:bg-yellow-600">
+                    Apuntarse
+                </button>
+            </div>
+
+            <!-- Logística -->
+            <div class="p-4 bg-gray-800 rounded">
+                <h3 class="text-xl mb-2">🚚 Logística</h3>
+                <button class="px-4 py-2 bg-primary text-black rounded hover:bg-yellow-600">
+                    Apuntarse
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funcionalidad básica
+        const userSelect = document.getElementById('userSelect');
+        const buttons = document.querySelectorAll('button');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (!userSelect.value) {
+                    alert('Por favor selecciona tu nombre primero');
+                    return;
+                }
+
+                if (button.textContent.trim() === 'Apuntarse') {
+                    button.textContent = 'Salir';
+                    button.classList.remove('bg-primary', 'hover:bg-yellow-600');
+                    button.classList.add('bg-red-600', 'hover:bg-red-700');
+                } else {
+                    button.textContent = 'Apuntarse';
+                    button.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    button.classList.add('bg-primary', 'hover:bg-yellow-600');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
