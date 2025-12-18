@@ -1,0 +1,99 @@
+<!-- SIDEBAR NAVIGATION - Copiar a todas las páginas internas -->
+<aside
+    class="hidden lg:flex w-[280px] flex-col border-r border-white/5 bg-[#0a0a0a] sticky top-0 h-screen overflow-y-auto">
+    <div class="p-8">
+        <div class="flex gap-4 items-center mb-10 cursor-pointer" onclick="window.location.href='index.html'">
+            <div class="bg-center bg-no-repeat bg-cover rounded-full size-12 ring-2 ring-primary/30"
+                data-alt="Abstract festive fireworks pattern"
+                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDYzezRMw-ZJ_4lYhyAj2309Pc1oDIItR3DwLkU51AfP-txe7GtQ2Ulc1RZNpxlfbJMPRPU2nvGOBch_C4aLy6a0hKACFYMiGMO4kncDF_cgJcGr_xjYhJ4An1MN1QM5DmFaFcjWg25UeIdmfK1YKkVIQMktY40Fudk2S757_Q-XZFrNSgVwFOXEdRVHJA7oK6oItPb4bz3iOKCZBCuX0sa0LXQ2aRsbqgmhqxXp_uUHTDFUYsHl-BkgSjkv8WYxLiiRrFg_2ksclE");'>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-white text-xl font-serif font-bold leading-tight tracking-wide">Fin de Año <span
+                        class="text-primary">2025</span></h1>
+                <p class="text-gray-500 text-xs font-medium uppercase tracking-widest mt-0.5">Organización</p>
+            </div>
+        </div>
+        <nav class="flex flex-col gap-3">
+            <!-- Planning - activo si página = planning.html -->
+            <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all group border-l-2 border-transparent hover:border-white/20 nav-link"
+                href="planning.html" data-page="planning">
+                <span
+                    class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">calendar_month</span>
+                <p class="text-gray-400 group-hover:text-white text-sm font-medium transition-colors">Planning</p>
+            </a>
+            <!-- Equipo -->
+            <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all group border-l-2 border-transparent hover:border-white/20 nav-link"
+                href="equipo.html" data-page="equipo">
+                <span
+                    class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">groups</span>
+                <p class="text-gray-400 group-hover:text-white text-sm font-medium transition-colors">Equipo</p>
+            </a>
+            <!-- Tabla -->
+            <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all group border-l-2 border-transparent hover:border-white/20 nav-link"
+                href="tabla.html" data-page="tabla">
+                <span
+                    class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">account_balance_wallet</span>
+                <p class="text-gray-400 group-hover:text-white text-sm font-medium transition-colors">Tabla</p>
+            </a>
+            <!-- Evento -->
+            <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all group border-l-2 border-transparent hover:border-white/20 nav-link"
+                href="evento.html" data-page="evento">
+                <span
+                    class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">diamond</span>
+                <p class="text-gray-400 group-hover:text-white text-sm font-medium transition-colors">Evento</p>
+            </a>
+            <!-- Volver -->
+            <a class="flex items-center gap-4 px-4 py-3.5 rounded-xl hover:bg-white/5 transition-all group border-l-2 border-transparent hover:border-white/20"
+                href="index.html">
+                <span
+                    class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">logout</span>
+                <p class="text-gray-400 group-hover:text-white text-sm font-medium transition-colors">Volver</p>
+            </a>
+        </nav>
+    </div>
+    <div class="mt-auto p-6 border-t border-white/5">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-1 ring-white/10"
+                    data-alt="User profile picture placeholder"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDMY11y4e5WwOIuD0jCyfdr0DL_RKIMZcqQaeSGgKAf5NrEyuajZp4ompAZ88MJTo11n34z3A97Shai16l-l4SdfGPOVi8-P25p_FGGgPmDGjMd7ZYR4wA9yHC5H-3hAWE2XWAk47Zvn8O3wVgYl2NbQsoMdJti586BlcIpK1bOW3WBerUs-a9HBrlM_168ApmIO7G_Xc9hIm76pkF4a55KcOvoFOd8OxDwPKEmHdiP-1AAr-J1vqd_ybVZ6TMqMYRLJjNH_V1_zsI");'>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-sm font-semibold text-white current-user-name">Usuario</span>
+                    <span class="text-xs text-primary">Miembro</span>
+                </div>
+            </div>
+            <button class="text-gray-500 hover:text-white transition-colors"
+                onclick="window.location.href='index.html'">
+                <span class="material-symbols-outlined text-xl">logout</span>
+            </button>
+        </div>
+    </div>
+</aside>
+
+<script>
+    // Activar el enlace correcto basado en la página actual
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        navLinks.forEach(link => {
+            const linkPage = link.getAttribute('data-page');
+            if (linkPage === currentPage) {
+                link.classList.remove('hover:bg-white/5', 'border-transparent');
+                link.classList.add('bg-gradient-to-r', 'from-primary/20', 'to-transparent', 'border-primary');
+                link.querySelector('span').classList.remove('text-gray-400');
+                link.querySelector('span').classList.add('text-primary');
+                link.querySelector('p').classList.remove('text-gray-400');
+                link.querySelector('p').classList.add('text-white', 'font-semibold');
+            }
+        });
+
+        // Mostrar nombre del usuario actual
+        const currentUser = localStorage.getItem('currentUser');
+        if (currentUser) {
+            const userNameEl = document.querySelector('.current-user-name');
+            if (userNameEl) userNameEl.textContent = currentUser;
+        }
+    });
+</script>
