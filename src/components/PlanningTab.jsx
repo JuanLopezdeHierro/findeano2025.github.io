@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { GlassPanel } from './ui/GlassPanel';
+import { GlassPanel, cn } from './ui/GlassPanel';
 import { useSheets, CATEGORIES, USERS, REAL_USERS } from '../hooks/useSheets';
 
 export default function PlanningTab({ currentUser, onLogin }) {
