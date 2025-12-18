@@ -1,5 +1,5 @@
 // ===== GOOGLE SHEETS INTEGRATION =====
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxn5Yk7puVurgFr8KIC5jW_x3cmAUyQYZgD-RbkM_6MbIEWlfAva2JdE2a6M7Btk0vZIw/exec';
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwHv2U_nX7lxjKZnPbce0GbTYjkdjnWPe5eN9mSIwxCC1oapWhb33L6JQJ8WZRPZOo9rQ/exec';
 
 const USERS = ['Juan', 'Quintana', 'Germán', 'Jose', 'Cantero', 'Alejandro', 'David', 'Jorge', 'Arbelo'];
 
