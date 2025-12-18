@@ -1,9 +1,17 @@
 import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
-    plugins: [react()],
-    // Base URL for GitHub Pages deployment
     base: '/findeano2025.github.io/',
+    build: {
+        rollupOptions: {
+            input: {
+                main: 'public/index.html',
+                planning: 'public/planning.html',
+                tabla: 'public/tabla.html',
+                evento: 'public/evento.html',
+                equipo: 'public/equipo.html'
+            }
+        }
+    },
+    publicDir: 'public'
 })
