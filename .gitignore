@@ -1,0 +1,4 @@
+# Project Files
+node_modules/
+dist/
+.vite/
