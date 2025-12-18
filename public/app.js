@@ -1,7 +1,7 @@
 // ===== GOOGLE SHEETS INTEGRATION =====
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwHv2U_nX7lxjKZnPbce0GbTYjkdjnWPe5eN9mSIwxCC1oapWhb33L6JQJ8WZRPZOo9rQ/exec';
 
-const USERS = ['Juan', 'Quintana', 'Germán', 'Jose', 'Cantero', 'Alejandro', 'David', 'Jorge', 'Arbelo'];
+const USERS = ['Juan', 'Quintana', 'Alejandro', 'Arbelo', 'Cantero', 'Germán', 'David', 'Jorge', 'Jose'];
 
 const CATEGORIES = [
     { id: 'Alcohol', name: 'Alcohol', icon: 'wine_bar', limit: 112.5 },
